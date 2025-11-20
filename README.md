@@ -13,6 +13,7 @@ DeceptionDetector-JAX is a research toolkit for training small transformer model
 - Interpretability tools (probing, patching, ablation, causal scrubbing)
 - Deception detection benchmark suite
 - Interactive Jupyter notebooks
+- **🆕 Interactive Streamlit Dashboard** for visualization and analysis
 
 ## Project Structure
 
@@ -92,6 +93,24 @@ python scripts/run_deception_benchmarks.py \
     --data-path data/hidden_check/test.npz \
     --output-path results/benchmark.json
 ```
+
+### 4. Launch Interactive Dashboard 🆕
+
+```bash
+# Run the Streamlit app
+streamlit run streamlit_app/app.py
+
+# Or use the convenience script
+./run_app.sh
+```
+
+The dashboard provides:
+- 🔬 **Deception Benchmarks** - Compare benchmark results across tasks
+- 👁️ **Activation Explorer** - Visualize attention patterns and activations
+- 🎯 **Linear Probing** - Train probes to decode hidden variables
+- 🚀 **Model Inference** - Test models on examples
+
+See `streamlit_app/README.md` for detailed documentation.
 
 ## Deception Tasks
 
