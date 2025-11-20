@@ -32,7 +32,7 @@ def create_train_state(rng, config: ModelConfig, learning_rate: float):
     return TrainState.create(apply_fn=model.apply, params=params, tx=tx), model
 
 
-def compute_loss(params, model, batch, deterministic=True):
+def compute_loss(params, model, batch, deterministic=True, rng=None):
     """
     Compute cross-entropy loss.
 
@@ -41,6 +41,7 @@ def compute_loss(params, model, batch, deterministic=True):
         model: TinyTransformer model
         batch: Dict with input_ids and target_ids
         deterministic: Whether to use dropout
+        rng: Random key for dropout
 
     Returns:
         loss: Scalar loss
@@ -49,19 +50,25 @@ def compute_loss(params, model, batch, deterministic=True):
     target_ids = batch["target_ids"]
 
     # Forward pass
-    logits, _ = model.apply(
-        {"params": params},
-        input_ids,
-        deterministic=deterministic,
-        return_cache=False,
-    )
+    if deterministic:
+        logits, _ = model.apply(
+            {"params": params},
+            input_ids,
+            deterministic=deterministic,
+            return_cache=False,
+        )
+    else:
+        logits, _ = model.apply(
+            {"params": params},
+            input_ids,
+            deterministic=deterministic,
+            return_cache=False,
+            rngs={"dropout": rng},
+        )
 
     # Compute cross-entropy loss
     # Mask for valid targets (non-zero)
     mask = target_ids > 0
-
-    if jnp.sum(mask) == 0:
-        return 0.0
 
     # Log probabilities
     log_probs = jax.nn.log_softmax(logits, axis=-1)
@@ -72,8 +79,8 @@ def compute_loss(params, model, batch, deterministic=True):
     seq_idx = jnp.arange(seq_len)[None, :]
     target_log_probs = log_probs[batch_idx, seq_idx, target_ids]
 
-    # Average over valid positions
-    loss = -jnp.sum(target_log_probs * mask) / jnp.sum(mask)
+    # Average over valid positions (add epsilon to avoid division by zero)
+    loss = -jnp.sum(target_log_probs * mask) / (jnp.sum(mask) + 1e-8)
 
     return loss
 
@@ -96,21 +103,19 @@ def compute_accuracy(params, model, batch):
 
     # Compute accuracy on valid positions
     mask = target_ids > 0
-    if jnp.sum(mask) == 0:
-        return 0.0
 
     correct = (predictions == target_ids) * mask
-    accuracy = jnp.sum(correct) / jnp.sum(mask)
+    accuracy = jnp.sum(correct) / (jnp.sum(mask) + 1e-8)
 
     return accuracy
 
 
 @jax.jit
-def train_step(state, batch):
+def train_step(state, batch, rng):
     """Single training step."""
 
     def loss_fn(params):
-        return compute_loss(params, state.apply_fn.__self__, batch, deterministic=False)
+        return compute_loss(params, state.apply_fn.__self__, batch, deterministic=False, rng=rng)
 
     loss, grads = jax.value_and_grad(loss_fn)(state.params)
     state = state.apply_gradients(grads=grads)
@@ -141,10 +146,15 @@ def train_epoch(state, train_data, batch_size, rng):
     epoch_loss = 0.0
     num_batches = 0
 
-    for batch in create_batches(train_data, batch_size, rng):
+    batch_rng, dropout_rng = jax.random.split(rng)
+
+    for batch in create_batches(train_data, batch_size, batch_rng):
         # Convert to JAX arrays
         batch = {k: jnp.array(v) for k, v in batch.items()}
-        state, loss = train_step(state, batch)
+
+        # Split RNG for this batch's dropout
+        dropout_rng, step_rng = jax.random.split(dropout_rng)
+        state, loss = train_step(state, batch, step_rng)
         epoch_loss += loss
         num_batches += 1
 

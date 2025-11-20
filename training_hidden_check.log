@@ -1,0 +1,45 @@
+Loading data from data/hidden_check...
+  Train size: 5000
+  Val size: 500
+
+Model config:
+  d_model: 64
+  n_heads: 4
+  n_layers: 2
+
+Initializing model...
+
+Training for 15 epochs...
+============================================================
+Epoch   1/15 | Train Loss: 2.7512 | Val Loss: 0.5716 | Val Acc: 0.9255 | Time: 3.7s
+  → New best model (val_loss: 0.5716)
+Epoch   2/15 | Train Loss: 0.5304 | Val Loss: 0.1534 | Val Acc: 0.9733 | Time: 1.2s
+  → New best model (val_loss: 0.1534)
+Epoch   3/15 | Train Loss: 0.2409 | Val Loss: 0.0735 | Val Acc: 0.9941 | Time: 1.2s
+  → New best model (val_loss: 0.0735)
+Epoch   4/15 | Train Loss: 0.1422 | Val Loss: 0.0542 | Val Acc: 0.9878 | Time: 1.2s
+  → New best model (val_loss: 0.0542)
+Epoch   5/15 | Train Loss: 0.1025 | Val Loss: 0.0234 | Val Acc: 0.9980 | Time: 1.2s
+  → New best model (val_loss: 0.0234)
+Epoch   6/15 | Train Loss: 0.0709 | Val Loss: 0.0227 | Val Acc: 0.9961 | Time: 1.2s
+  → New best model (val_loss: 0.0227)
+Epoch   7/15 | Train Loss: 0.0595 | Val Loss: 0.0211 | Val Acc: 0.9941 | Time: 1.2s
+  → New best model (val_loss: 0.0211)
+Epoch   8/15 | Train Loss: 0.0485 | Val Loss: 0.0113 | Val Acc: 1.0000 | Time: 1.2s
+  → New best model (val_loss: 0.0113)
+Epoch   9/15 | Train Loss: 0.0368 | Val Loss: 0.0096 | Val Acc: 0.9976 | Time: 1.2s
+  → New best model (val_loss: 0.0096)
+Epoch  10/15 | Train Loss: 0.0451 | Val Loss: 0.0109 | Val Acc: 0.9980 | Time: 1.2s
+Epoch  11/15 | Train Loss: 0.0270 | Val Loss: 0.0074 | Val Acc: 0.9980 | Time: 1.2s
+  → New best model (val_loss: 0.0074)
+Epoch  12/15 | Train Loss: 0.0186 | Val Loss: 0.0061 | Val Acc: 0.9980 | Time: 1.2s
+  → New best model (val_loss: 0.0061)
+Epoch  13/15 | Train Loss: 0.0212 | Val Loss: 0.0031 | Val Acc: 1.0000 | Time: 1.2s
+  → New best model (val_loss: 0.0031)
+Epoch  14/15 | Train Loss: 0.0175 | Val Loss: 0.0070 | Val Acc: 1.0000 | Time: 1.2s
+Epoch  15/15 | Train Loss: 0.0184 | Val Loss: 0.0045 | Val Acc: 1.0000 | Time: 1.2s
+============================================================
+✓ Training complete!
+  Best val loss: 0.0031
+  Saved parameters to: checkpoints/hidden_check/final_params.npy
+  Saved history to: checkpoints/hidden_check/history.npz
